@@ -43,3 +43,8 @@ name and password. On first run the `admin` user is created with the
 - For a DS on your network to connect, the firewall must allow incoming
   connections on the port. On Windows, as administrator:
   `netsh advfirewall firewall add rule name="DS Shop" dir=in action=allow protocol=TCP localport=8080`
+
+## License
+
+This project is dedicated to the public domain under
+[CC0 1.0](LICENSE): use it however you like, no attribution required.
