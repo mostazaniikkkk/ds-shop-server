@@ -1,0 +1,24 @@
+{{define "login.html"}}<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · {{.Name}}</title>
+<link rel="stylesheet" href="/admin/static/admin.css">
+</head>
+<body class="login-page">
+<form class="card login" method="post" action="/admin/login">
+  <div class="login-head">
+    <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path fill="currentColor" d="M7 7V6a5 5 0 0 1 10 0v1h3a1 1 0 0 1 1 1v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3Zm2 0h6V6a3 3 0 0 0-6 0v1Z"/></svg>
+    <h1>{{.Name}}</h1>
+    <p class="muted">Panel de administración</p>
+  </div>
+  {{if .Err}}<p class="flash err">{{.Err}}</p>{{end}}
+  <label>Usuario<input name="user" autocomplete="username" required autofocus></label>
+  <label>Contraseña<input name="pass" type="password" autocomplete="current-password" required></label>
+  <input type="hidden" name="next" value="{{.Next}}">
+  <button class="wide">Entrar</button>
+</form>
+</body>
+</html>
+{{end}}

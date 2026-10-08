@@ -1,0 +1,103 @@
+{{define "title.html"}}{{template "head" .}}
+{{$rev := .D.Revision}}
+<p class="crumbs"><a href="/admin/">Catálogo</a> › {{first .T}}</p>
+
+<section class="card hero">
+  <div class="bigicon">{{if .T.Icon}}<img src="/admin/icon/{{.T.ID}}?v={{$rev}}" width="96" height="96" alt="">{{end}}</div>
+  <div>
+    <h1>{{first .T}}</h1>
+    <p class="muted">{{rest .T}}</p>
+    <p>
+      {{if .T.IsLink}}<span class="pill link">Enlace · {{.T.LinkHost}}</span>{{else}}<span class="pill file">Archivo en el servidor</span>{{end}}
+      {{if .T.Visible}}<span class="pill on">Publicado</span>{{else}}<span class="pill">Oculto</span>{{end}}
+      <span class="pill">{{blocks .T.Size}} bloques · {{size .T.Size}}</span>
+      <span class="pill">{{.T.Downloads}} descargas</span>
+    </p>
+  </div>
+</section>
+
+<div class="cols">
+<section class="card">
+  <h2>Ficha en la tienda</h2>
+  <form method="post" action="/admin/title/{{.T.ID}}" class="stack">
+    <label>Nombre <span class="muted">(vacío = el del banner; cada línea es una línea del título)</span>
+      <textarea name="name" rows="3" maxlength="200" placeholder="{{name .T}}">{{.T.Name}}</textarea></label>
+    <label>Descripción
+      <textarea name="description" rows="6" maxlength="2000">{{.T.Description}}</textarea></label>
+    <label>Nombre del archivo en la SD
+      <input name="file_name" value="{{.T.FileName}}" maxlength="60" required></label>
+    <label>Categoría
+      <select name="category">
+        <option value="0">Sin categoría</option>
+        {{$c := .T.Category}}
+        {{range .D.Categories}}<option value="{{.ID}}" {{if eq .ID $c}}selected{{end}}>{{.Name}}</option>{{end}}
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" name="visible" {{if .T.Visible}}checked{{end}}> Publicado en la tienda</label>
+    <button>Guardar cambios</button>
+  </form>
+</section>
+
+<div class="stack-cards">
+<section class="card">
+  <h2>Icono</h2>
+  <div class="icon-edit">
+    <div class="bigicon small">{{if .T.Icon}}<img src="/admin/icon/{{.T.ID}}?v={{$rev}}" width="64" height="64" alt="">{{end}}</div>
+    <div>
+      {{if .T.IconCustom}}<p class="muted">Icono propio. La DS lo muestra en lugar del de la ROM.</p>
+      {{else}}<p class="muted">Es el icono del banner de la ROM. Puedes poner otro (PNG, GIF o JPG; se reduce a 32×32 y 15 colores).</p>{{end}}
+      <form method="post" action="/admin/title/{{.T.ID}}/icon" enctype="multipart/form-data" class="stack">
+        <label class="drop small-drop" data-drop>
+          <input type="file" name="icon" accept="image/png,image/gif,image/jpeg" required>
+          <span data-drop-text>Elige o arrastra una imagen</span>
+        </label>
+        <button class="secondary">Cambiar icono</button>
+      </form>
+      {{if .T.IconCustom}}
+      <form method="post" action="/admin/title/{{.T.ID}}/icon/reset"><button class="link">Volver al icono de la ROM</button></form>
+      {{end}}
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Origen del archivo</h2>
+  {{if .T.IsLink}}
+    {{if .T.LinkError}}<p class="flash err">Última comprobación ({{date .T.Checked}}): {{.T.LinkError}}</p>
+    {{else}}<p class="muted">Comprobado por última vez: {{date .T.Checked}}</p>{{end}}
+    <form method="post" action="/admin/title/{{.T.ID}}/check" class="stack">
+      <label>Enlace<input name="url" type="url" value="{{.T.URL}}" required></label>
+      <button class="secondary" data-busy="Comprobando…">Comprobar / actualizar enlace</button>
+    </form>
+    <p class="muted">Si cambias el archivo enlazado (por ejemplo, una versión nueva con el mismo enlace), compruébalo aquí para actualizar el tamaño y el banner.</p>
+    <p><a class="btn secondary" href="{{.T.URL}}" target="_blank" rel="noopener">Abrir el enlace</a></p>
+  {{else}}
+    <dl>
+      <dt>SHA-1</dt><dd><code>{{.T.SHA1}}</code></dd>
+    </dl>
+    <p><a class="btn secondary" href="/admin/title/{{.T.ID}}/rom">Descargar la ROM</a></p>
+  {{end}}
+</section>
+
+<section class="card">
+  <h2>Datos de la ROM</h2>
+  <dl>
+    <dt>Código de juego</dt><dd>{{or .T.GameCode "—"}}</dd>
+    <dt>Tamaño</dt><dd>{{.T.Size}} bytes</dd>
+    <dt>Añadido</dt><dd>{{date .T.Added}}</dd>
+  </dl>
+  <h3>Título del banner</h3>
+  <dl>
+    {{range bannerRows .T}}<dt>{{index . 0}}</dt><dd class="pre">{{index . 1}}</dd>{{end}}
+  </dl>
+</section>
+
+<section class="card danger-zone">
+  <h2>Borrar</h2>
+  <form method="post" action="/admin/title/{{.T.ID}}/delete" data-confirm="¿Borrar este título de la tienda?{{if not .T.IsLink}} También se borrará la ROM del servidor.{{end}}">
+    <button class="danger">Borrar título</button>
+  </form>
+</section>
+</div>
+</div>
+{{template "foot" .}}{{end}}

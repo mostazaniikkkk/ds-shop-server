@@ -1,0 +1,36 @@
+{{define "users.html"}}{{template "head" .}}
+<div class="cols">
+<section class="card">
+  <h2>Usuarios del panel</h2>
+  <ul class="users">
+  {{range .Users}}
+    <li>
+      <span>{{.}}{{if eq . $.User}} <span class="pill on">tú</span>{{end}}</span>
+      {{if ne . $.User}}
+      <form method="post" action="/admin/users/{{.}}/delete" data-confirm="¿Borrar el usuario {{.}}?">
+        <button class="danger small">Borrar</button>
+      </form>
+      {{end}}
+    </li>
+  {{end}}
+  </ul>
+  <h3>Nuevo usuario</h3>
+  <form method="post" action="/admin/users" class="stack">
+    <label>Usuario<input name="name" required maxlength="32" autocomplete="off"></label>
+    <label>Contraseña<input name="pass" type="password" required minlength="6" autocomplete="new-password"></label>
+    <button>Crear usuario</button>
+  </form>
+</section>
+
+<section class="card">
+  <h2>Cambiar mi contraseña</h2>
+  <form method="post" action="/admin/users/password" class="stack">
+    <label>Contraseña actual<input name="old" type="password" required autocomplete="current-password"></label>
+    <label>Contraseña nueva<input name="new" type="password" required minlength="6" autocomplete="new-password"></label>
+    <label>Repite la nueva<input name="new2" type="password" required minlength="6" autocomplete="new-password"></label>
+    <button>Cambiar contraseña</button>
+  </form>
+  <p class="muted">Al cambiarla se cierran tus otras sesiones abiertas.</p>
+</section>
+</div>
+{{template "foot" .}}{{end}}

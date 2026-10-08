@@ -1,0 +1,42 @@
+{{define "head"}}<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.D.Name}} · Administración</title>
+<link rel="stylesheet" href="/admin/static/admin.css">
+<script src="/admin/static/admin.js" defer></script>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="/admin/">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M7 7V6a5 5 0 0 1 10 0v1h3a1 1 0 0 1 1 1v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a1 1 0 0 1 1-1h3Zm2 0h6V6a3 3 0 0 0-6 0v1Z"/></svg>
+      {{.D.Name}}
+    </a>
+    <nav>
+      <a href="/admin/" class="{{if or (eq .Section "index") (eq .Section "title")}}on{{end}}">Catálogo</a>
+      <a href="/admin/settings" class="{{if eq .Section "settings"}}on{{end}}">Tienda</a>
+      <a href="/admin/users" class="{{if eq .Section "users"}}on{{end}}">Usuarios</a>
+    </nav>
+    <form method="post" action="/admin/logout" class="who">
+      <span>{{.User}}</span>
+      <button class="link">Salir</button>
+    </form>
+  </div>
+</header>
+<main>
+{{if .Msg}}<p class="flash ok">{{.Msg}}</p>{{end}}
+{{if .Err}}<p class="flash err">{{.Err}}</p>{{end}}
+{{end}}
+
+{{define "foot"}}
+</main>
+</body>
+</html>
+{{end}}
+
+{{define "catoptions"}}
+  <option value="0">Sin categoría</option>
+  {{range .}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+{{end}}

@@ -1,0 +1,73 @@
+{{define "index.html"}}{{template "head" .}}
+<section class="stats">
+  <div class="stat"><b>{{len .D.Titles}}</b><span>títulos</span></div>
+  <div class="stat"><b>{{.Visible}}</b><span>publicados</span></div>
+  <div class="stat"><b>{{.Links}}</b><span>enlaces externos</span></div>
+  <div class="stat"><b>{{.Total}}</b><span>descargas</span></div>
+  {{if .Broken}}<div class="stat bad"><b>{{.Broken}}</b><span>enlaces con error</span></div>{{end}}
+</section>
+
+<section class="card">
+  <div class="tabs" data-tabs>
+    <button type="button" class="on" data-tab="up">Subir archivo</button>
+    <button type="button" data-tab="link">Enlace directo</button>
+  </div>
+
+  <form class="tab-body" data-body="up" method="post" action="/admin/upload" enctype="multipart/form-data">
+    <p class="muted">Las ROM se guardan en el servidor. Se lee su banner: icono, título y código de juego.</p>
+    <div class="row-form">
+      <label>Categoría<select name="category">{{template "catoptions" .D.Categories}}</select></label>
+      <label class="drop grow" data-drop>
+        <input type="file" name="roms" accept=".nds,.dsi,.srl" multiple required>
+        <span data-drop-text>Arrastra aquí archivos .nds o haz clic para elegirlos</span>
+      </label>
+      <button>Subir</button>
+    </div>
+  </form>
+
+  <form class="tab-body" data-body="link" method="post" action="/admin/link" hidden>
+    <p class="muted">El archivo se queda donde está (por ejemplo, una release de GitHub). El servidor lo
+      lee para sacar el icono y los datos, y se lo pasa a la DS cuando lo descarga, porque la consola no puede usar HTTPS.
+      El enlace tiene que llevar directamente al .nds.</p>
+    <div class="row-form">
+      <label class="grow">Enlace<input name="url" type="url" required placeholder="https://github.com/usuario/proyecto/releases/download/v1.0/juego.nds"></label>
+    </div>
+    <div class="row-form">
+      <label>Categoría<select name="category">{{template "catoptions" .D.Categories}}</select></label>
+      <label class="grow">Nombre del archivo en la SD <span class="muted">(opcional)</span><input name="file_name" placeholder="se toma del enlace"></label>
+      <button data-busy="Leyendo el enlace…">Añadir enlace</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="card-head">
+    <h2>Títulos</h2>
+    {{if .D.Titles}}<input class="search" type="search" placeholder="Buscar…" data-filter="#titles">{{end}}
+  </div>
+  {{if .D.Titles}}
+  <div class="tlist" id="titles">
+    {{$cats := .D.Categories}}{{$rev := .D.Revision}}
+    {{range .D.Titles}}
+    <a class="trow {{if not .Visible}}hidden{{end}}" href="/admin/title/{{.ID}}" data-text="{{name .}} {{.FileName}} {{.GameCode}} {{catname $cats .Category}}">
+      <span class="ticon">{{if .Icon}}<img src="/admin/icon/{{.ID}}?v={{$rev}}" width="32" height="32" alt="">{{end}}</span>
+      <span class="tmain">
+        <strong>{{first .}}</strong>
+        <small>{{rest .}}</small>
+      </span>
+      <span class="tmeta">
+        {{if .IsLink}}<span class="pill link" title="{{.URL}}">Enlace · {{.LinkHost}}</span>{{else}}<span class="pill file">Archivo</span>{{end}}
+        {{if .LinkError}}<span class="pill bad" title="{{.LinkError}}">Error</span>{{end}}
+        {{with catname $cats .Category}}<span class="pill">{{.}}</span>{{end}}
+        {{if not .Visible}}<span class="pill">Oculto</span>{{end}}
+      </span>
+      <span class="tnum">{{blocks .Size}} bloques<small>{{size .Size}}</small></span>
+      <span class="tnum">{{.Downloads}}<small>descargas</small></span>
+    </a>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="empty">Todavía no hay títulos. Sube un .nds o añade un enlace directo.</p>
+  {{end}}
+</section>
+{{template "foot" .}}{{end}}

@@ -1,0 +1,33 @@
+{{define "settings.html"}}{{template "head" .}}
+<div class="cols">
+<section class="card">
+  <h2>Tienda</h2>
+  <form method="post" action="/admin/info" class="stack">
+    <label>Nombre<input name="name" value="{{.D.Name}}" maxlength="60" required></label>
+    <label>Mensaje de bienvenida <span class="muted">(se ve en la DS cuando las tiendas van por separado)</span>
+      <textarea name="message" rows="3" maxlength="300">{{.D.Message}}</textarea></label>
+    <button>Guardar</button>
+  </form>
+  <h3>Dirección para la DS</h3>
+  <p class="muted">En la DS: Tiendas → «Añadir tienda» con una de estas direcciones (la de la red en la que esté la consola):</p>
+  <ul class="urls">{{range .DSURLs}}<li><code>{{.}}</code></li>{{end}}</ul>
+  <p class="muted">La DS solo se conecta a redes abiertas o WEP y no admite HTTPS. Si la consola no conecta, revisa que el
+    firewall del equipo deje entrar conexiones a este puerto.</p>
+</section>
+
+<section class="card">
+  <h2>Categorías</h2>
+  {{range .D.Categories}}
+  <form method="post" action="/admin/category/{{.ID}}" class="row-form">
+    <input name="name" value="{{.Name}}" maxlength="40" required>
+    <button name="action" value="rename" class="secondary">Renombrar</button>
+    <button name="action" value="delete" class="danger" formnovalidate data-confirm="¿Borrar la categoría? Sus títulos quedarán sin categoría.">Borrar</button>
+  </form>
+  {{else}}<p class="muted">No hay categorías: todos los títulos aparecen juntos.</p>{{end}}
+  <form method="post" action="/admin/category" class="row-form">
+    <input name="name" placeholder="Nueva categoría" maxlength="40" required>
+    <button>Añadir</button>
+  </form>
+</section>
+</div>
+{{template "foot" .}}{{end}}
